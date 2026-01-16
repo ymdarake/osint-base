@@ -6,6 +6,7 @@ description: 地理空間情報（GEOINT）を扱うスキル。座標変換、O
 # OSINT GEOINT (Geospatial Intelligence)
 
 地理空間情報を扱うためのスキル。
+**Pythonコードの実行はDockerコンテナ経由で行う。**
 
 ## 座標形式の変換
 
@@ -17,25 +18,31 @@ description: 地理空間情報（GEOINT）を扱うスキル。座標変換、O
 | 10進数 (DD) | 35.6894, 139.7583 | Google Maps、API |
 | UTM | 54S 389456 3948234 | 軍事、測量 |
 
-### 変換ツール
+### 変換ツール（Docker経由）
 
-**Python (geopy):**
-```python
-from geopy.geocoders import Nominatim
-from geopy.point import Point
-
+```bash
 # DMS → DD
-point = Point("35°41'22\"N 139°45'30\"E")
-print(f"{point.latitude}, {point.longitude}")
+docker compose run --rm osint python -c "
+from geopy.point import Point
+point = Point(\"35°41'22\\\"N 139°45'30\\\"E\")
+print(f'{point.latitude}, {point.longitude}')
+"
 
 # 住所 → 座標
-geolocator = Nominatim(user_agent="osint")
-location = geolocator.geocode("東京駅")
-print(f"{location.latitude}, {location.longitude}")
+docker compose run --rm osint python -c "
+from geopy.geocoders import Nominatim
+geolocator = Nominatim(user_agent='osint')
+location = geolocator.geocode('東京駅')
+print(f'{location.latitude}, {location.longitude}')
+"
 
 # 座標 → 住所（逆ジオコーディング）
-location = geolocator.reverse("35.6812, 139.7671")
+docker compose run --rm osint python -c "
+from geopy.geocoders import Nominatim
+geolocator = Nominatim(user_agent='osint')
+location = geolocator.reverse('35.6812, 139.7671')
 print(location.address)
+"
 ```
 
 ## Overpass Turbo クエリ

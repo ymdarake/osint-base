@@ -19,11 +19,9 @@ osint-base/
 │   └── challenge_XX/
 │       ├── evidence/   # 収集した証拠
 │       ├── frames/     # 動画フレーム
-│       ├── notes.md    # 調査メモ
-│       └── scripts/    # 一時スクリプト
+│       └── writeup.md  # 解法メモ（チャレンジ完結型）
 ├── tools/              # カスタムスクリプト
-├── references/         # 参考資料
-└── writeups/           # 解法メモ（大会後）
+└── references/         # 参考資料
 ```
 
 ## セットアップ

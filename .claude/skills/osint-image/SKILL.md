@@ -6,6 +6,7 @@ description: 画像からOSINT情報を抽出するスキル。画像のメタ�
 # OSINT Image Analysis
 
 画像からインテリジェンス情報を抽出するためのスキル。
+**すべてのコマンドはDockerコンテナ経由で実行する。**
 
 ## ワークフロー
 
@@ -13,16 +14,16 @@ description: 画像からOSINT情報を抽出するスキル。画像のメタ�
 
 ```bash
 # 全メタデータを表示
-exiftool <image>
+docker compose run --rm osint exiftool /workspace/challenges/<challenge>/evidence/<image>
 
 # GPS座標のみ
-exiftool -GPS* <image>
+docker compose run --rm osint exiftool -GPS* /workspace/challenges/<challenge>/evidence/<image>
 
 # 撮影日時のみ
-exiftool -CreateDate -DateTimeOriginal <image>
+docker compose run --rm osint exiftool -CreateDate -DateTimeOriginal /workspace/challenges/<challenge>/evidence/<image>
 
 # カメラ情報
-exiftool -Make -Model -Software <image>
+docker compose run --rm osint exiftool -Make -Model -Software /workspace/challenges/<challenge>/evidence/<image>
 ```
 
 **重要なEXIFフィールド:**
@@ -35,23 +36,16 @@ exiftool -Make -Model -Software <image>
 
 ```bash
 # 基本OCR（英語）
-tesseract <image> stdout
+docker compose run --rm osint tesseract /workspace/challenges/<challenge>/evidence/<image> stdout
 
 # 日本語OCR
-tesseract <image> stdout -l jpn
+docker compose run --rm osint tesseract /workspace/challenges/<challenge>/evidence/<image> stdout -l jpn
 
 # 多言語OCR
-tesseract <image> stdout -l jpn+eng+chi_sim+rus+kor+ara
+docker compose run --rm osint tesseract /workspace/challenges/<challenge>/evidence/<image> stdout -l jpn+eng+chi_sim+rus+kor+ara
 ```
 
-**Pythonでの実行:**
-```python
-import pytesseract
-from PIL import Image
-
-text = pytesseract.image_to_string(Image.open('image.jpg'), lang='jpn+eng')
-print(text)
-```
+**対応言語:** `ara`(アラビア), `chi_sim`(中国語), `eng`(英語), `jpn`(日本語), `kor`(韓国語), `rus`(ロシア語)
 
 ### 3. 画像分析チェックリスト
 
@@ -81,7 +75,8 @@ print(text)
 画像のメタデータとOCRを一括実行するスクリプト。
 
 ```bash
-python scripts/analyze_image.py <image_path> [--lang jpn+eng]
+docker compose run --rm osint python /workspace/.claude/skills/osint-image/scripts/analyze_image.py \
+  /workspace/challenges/<challenge>/evidence/<image> --lang jpn+eng
 ```
 
 ## 出力形式

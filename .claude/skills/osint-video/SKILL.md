@@ -6,6 +6,7 @@ description: 動画からOSINT情報を抽出するスキル。フレーム抽�
 # OSINT Video Analysis
 
 動画からインテリジェンス情報を抽出するためのスキル。
+**すべてのコマンドはDockerコンテナ経由で実行する。**
 
 ## ワークフロー
 
@@ -13,10 +14,12 @@ description: 動画からOSINT情報を抽出するスキル。フレーム抽�
 
 ```bash
 # 基本情報
-ffprobe -v quiet -print_format json -show_format <video>
+docker compose run --rm osint ffprobe -v quiet -print_format json -show_format \
+  /workspace/challenges/<challenge>/evidence/<video>
 
 # 詳細なストリーム情報
-ffprobe -v quiet -print_format json -show_format -show_streams <video>
+docker compose run --rm osint ffprobe -v quiet -print_format json -show_format -show_streams \
+  /workspace/challenges/<challenge>/evidence/<video>
 ```
 
 **重要なメタデータ:**
@@ -29,19 +32,24 @@ ffprobe -v quiet -print_format json -show_format -show_streams <video>
 
 ```bash
 # 5秒ごとにフレーム抽出
-ffmpeg -i <video> -vf "fps=1/5" ./frames/frame_%04d.png
+docker compose run --rm osint ffmpeg -i /workspace/challenges/<challenge>/evidence/<video> \
+  -vf "fps=1/5" /workspace/challenges/<challenge>/frames/frame_%04d.png
 
 # 1秒ごとにフレーム抽出（詳細分析用）
-ffmpeg -i <video> -vf "fps=1" ./frames/frame_%04d.png
+docker compose run --rm osint ffmpeg -i /workspace/challenges/<challenge>/evidence/<video> \
+  -vf "fps=1" /workspace/challenges/<challenge>/frames/frame_%04d.png
 
 # 特定時間のフレームを抽出（00:01:30の位置）
-ffmpeg -i <video> -ss 00:01:30 -frames:v 1 frame.png
+docker compose run --rm osint ffmpeg -i /workspace/challenges/<challenge>/evidence/<video> \
+  -ss 00:01:30 -frames:v 1 /workspace/challenges/<challenge>/frames/frame.png
 
 # キーフレームのみ抽出（高速）
-ffmpeg -i <video> -vf "select='eq(pict_type,I)'" -vsync vfr ./frames/keyframe_%04d.png
+docker compose run --rm osint ffmpeg -i /workspace/challenges/<challenge>/evidence/<video> \
+  -vf "select='eq(pict_type,I)'" -vsync vfr /workspace/challenges/<challenge>/frames/keyframe_%04d.png
 
 # サムネイル生成（代表的なフレーム）
-ffmpeg -i <video> -vf "thumbnail" -frames:v 1 thumbnail.png
+docker compose run --rm osint ffmpeg -i /workspace/challenges/<challenge>/evidence/<video> \
+  -vf "thumbnail" -frames:v 1 /workspace/challenges/<challenge>/frames/thumbnail.png
 ```
 
 ### 3. 動画分析チェックリスト
@@ -58,20 +66,24 @@ ffmpeg -i <video> -vf "thumbnail" -frames:v 1 thumbnail.png
 
 ```bash
 # 音声のみ抽出（MP3）
-ffmpeg -i <video> -vn -acodec mp3 audio.mp3
+docker compose run --rm osint ffmpeg -i /workspace/challenges/<challenge>/evidence/<video> \
+  -vn -acodec mp3 /workspace/challenges/<challenge>/evidence/audio.mp3
 
 # 音声のみ抽出（WAV、高品質）
-ffmpeg -i <video> -vn -acodec pcm_s16le audio.wav
+docker compose run --rm osint ffmpeg -i /workspace/challenges/<challenge>/evidence/<video> \
+  -vn -acodec pcm_s16le /workspace/challenges/<challenge>/evidence/audio.wav
 ```
 
 ### 5. 特定シーンの切り出し
 
 ```bash
 # 開始1分から30秒間を切り出し
-ffmpeg -i <video> -ss 00:01:00 -t 00:00:30 -c copy clip.mp4
+docker compose run --rm osint ffmpeg -i /workspace/challenges/<challenge>/evidence/<video> \
+  -ss 00:01:00 -t 00:00:30 -c copy /workspace/challenges/<challenge>/evidence/clip.mp4
 
 # 画質を下げてファイルサイズ削減
-ffmpeg -i <video> -vf "scale=640:-1" -crf 28 small.mp4
+docker compose run --rm osint ffmpeg -i /workspace/challenges/<challenge>/evidence/<video> \
+  -vf "scale=640:-1" -crf 28 /workspace/challenges/<challenge>/evidence/small.mp4
 ```
 
 ## スクリプト
@@ -81,7 +93,11 @@ ffmpeg -i <video> -vf "scale=640:-1" -crf 28 small.mp4
 動画からフレームを抽出し、各フレームのOCRも実行する。
 
 ```bash
-python scripts/extract_frames.py <video_path> --interval 5 --ocr
+docker compose run --rm osint python /workspace/.claude/skills/osint-video/scripts/extract_frames.py \
+  /workspace/challenges/<challenge>/evidence/<video> \
+  --interval 5 \
+  --output /workspace/challenges/<challenge>/frames \
+  --ocr --lang jpn+eng
 ```
 
 **オプション:**
