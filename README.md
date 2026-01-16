@@ -13,15 +13,15 @@ Claude Codeを活用したOSINT CTF攻略のための作業環境です。
 
 ```
 osint-base/
-├── CLAUDE.md           # OSINT分析官プロファイル（Claude Code用）
-├── README.md           # このファイル
-├── challenges/         # 課題ごとのワークスペース
-│   └── challenge_XX/
-│       ├── evidence/   # 収集した証拠
-│       ├── frames/     # 動画フレーム
-│       └── writeup.md  # 解法メモ（チャレンジ完結型）
+├── CLAUDE.md           # OSINT分析官プロファイル
+├── challenges/         # 出典元ごとに整理
+│   └── gralhix/        # Sofia Santos OSINT Exercises
+│       ├── README.md   # 大会/出典の説明
+│       └── exercise006/
+│           ├── evidence/
+│           └── writeup.md
 ├── tools/              # カスタムスクリプト
-└── references/         # 参考資料
+└── .claude/skills/     # Claude Code用スキル定義
 ```
 
 ## セットアップ
