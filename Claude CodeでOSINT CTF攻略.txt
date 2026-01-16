@@ -1,0 +1,272 @@
+﻿戦略的インテリジェンスレポート：SWIMMER DIVER OSINT CTFに向けた作戦傾向とClaude Codeによる自律型エージェントの運用統合
+第1章：SWIMMER DIVER OSINT CTFの戦略的環境と作戦領域
+現代のデジタルフォレンジックおよびオープンソースインテリジェンス（OSINT）の領域において、Capture The Flag（CTF）形式の競技会は、単なる技術的なパズル解読の場を超え、実世界での調査能力を測定する重要な演習場として機能している。本レポートは、2026年1月に開催が予定されている「SWIMMER OSINT CTF」への参戦を計画する初学者および実務家に対し、過去の傾向分析に基づいた包括的な対策と、Anthropic社の最新鋭CLIエージェント「Claude Code」を用いた作戦遂行の技術的枠組みを提供するものである。
+1.1 大会の理念と「現実世界指向」のパラダイム
+DIVER OSINT CTFシリーズは、その設計思想において「現実世界指向（Real-world oriented）」を強く掲げている 1。これは、一般的なセキュリティCTFで見られるような、人工的に隠されたフラグをバイナリ解析やエクスプロイトによって取得する形式とは一線を画す。参加者に求められるのは、公開された情報源（Web、SNS、地図データ、公的文書）を駆使し、断片的な情報から真実（フラグ）を再構築するインテリジェンス能力である。
+1.1.1 SWIMMERとDIVERの階層構造とターゲット層
+本競技会エコシステムは、主に二つのイベントによって構成されている。
+* DIVER OSINT CTF: 初心者から上級者までを対象としたメインイベントであり、国や地域を問わないニュートラルな課題設定が特徴である 2。
+* SWIMMER OSINT CTF: 初心者を主対象とした「ストーリー駆動型（Story Driven）」のスピンオフイベントである。2026年1月17日に開催が予定されており、日本国内向け（Domestic）の性質が強いものの、世界中からの参加が可能である 3。
+SWIMMERの最大の特徴は、その「物語性」と「教育的側面」にある 3。過去のイベント情報によれば、単に座標を特定するだけでなく、その場所で起きた出来事の背景や、登場人物の動機といった文脈的理解を問う問題が出題される傾向にある。これは、OSINTが単なるデータの収集（Collection）にとどまらず、分析（Analysis）と評価（Assessment）を含むプロセスであることを示唆している 4。
+1.1.2 競技形式とレギュレーションの分析
+SWIMMER OSINT CTF 2026は、以下のレギュレーション下で実施される 3。
+項目
+	詳細
+	戦略的含意
+	開催日時
+	2026年1月17日 12:10 (JST) - 18日 00:10 (JST)
+	12時間という比較的短い作戦時間（Time-box）は、迅速な情報処理とツールによる自動化の必要性を示唆する。
+	形式
+	Jeopardy（ジョパディ）形式
+	各問題に点数が設定され、難易度に応じて配分される。分野ごとの並行処理が可能。
+	チーム編成
+	1チーム最大6名
+	役割分担（GEOINT担当、SOCMINT担当、ツール担当など）が極めて重要となる。
+	言語
+	日本語 / 英語
+	バイリンガルでの調査能力が求められるが、翻訳ツール（およびLLM）の活用が前提となる。
+	1.2 出題傾向の深層分析と分類学
+過去のDIVER OSINT CTFおよび関連するライトアップ（解法解説）4 を詳細に分析することで、SWIMMERにおいて想定される課題のタクソノミー（分類）を構築することができる。これらは大きく、地理空間情報（GEOINT）、交通・移動体追跡（TRANSINT）、および社会・歴史的調査（SOCMINT/History）に大別される。
+1.2.1 地理空間情報（GEOINT）：静止画からの位置特定
+GEOINTは本大会の中核をなす領域である。出題される画像や動画から、撮影地点の正確な緯度経度や、特定の施設名を特定することが求められる。
+事例研究：サンクトペテルブルクの求人広告 5
+2025年の大会では、ポルトガルのニュース記事に含まれていた「求人広告の写真」から撮影場所を特定する課題が出題された。
+* 初期分析: 画像内にキリル文字と「Kyiv」「Rússia」というキーワードが存在。
+* ピボット（転換）: 画像検索（RIS: Reverse Image Search）により、元のニュースソースがニューヨーク・タイムズの記事であることを特定し、都市がロシアのサンクトペテルブルクであることを判明させる。
+* 細部特定: 広告の右下にある微細な文字をOCR（光学文字認識）で読み取り、「TOKYO-CITY」というレストランチェーン名を特定。
+* 最終確認: ストリートビューと衛星画像を照合し、座標（59.942837, 30.278211）を確定。
+この事例から、SWIMMERにおけるGEOINTは、「画像の全体像把握」→「テキスト情報の抽出」→「地図データとの照合」という標準的なプロセスを踏むことが不可欠であることがわかる。特に、OCR技術と翻訳、そして現地の店舗情報などを検索する能力が鍵となる。
+1.2.2 インフラストラクチャ解析と時間的推論（Chronolocation）
+単に場所を特定するだけでなく、「いつ」その状態であったかを問うクロノロケーション（時間特定）の問題も頻出である。
+事例研究：モンゴルの住居建設推移 5
+「What3slashes」という課題では、モンゴルのウランバートルにある特定の住居の建設状況から、撮影された年月を特定することが求められた。
+* 手掛かり: 画像内にwhat3wordsのアドレス（///ブムバ.ツォグツ.バタトガフ）が含まれており、場所は即座に特定可能。
+* 分析手法: Google Earth Proの「過去のイメージ（Historical Imagery）」機能を使用し、時系列で衛星画像を比較。左側の家が存在し、右側の家が建設中（屋根がない状態）である時期を特定する。
+* 正解: 2018年11月頃。
+この種の課題は、OSINTツールとしてGoogle Earth Pro（デスクトップ版）が必須であることを示している。Web版のGoogle EarthやGoogle Mapsでは過去の画像閲覧機能が制限されている場合があるため、環境構築における重要な要件となる。
+1.2.3 交通・移動体インテリジェンス（TRANSINT）
+航空機、船舶、鉄道などの移動体を追跡し、その識別情報や現在位置を特定する課題もDIVERの特徴である。
+事例研究：サンクション対象船舶の追跡 4
+「2024年10月25日に、制裁下のロシア船籍RORO船『ANGARA』がある港に停泊していたことが衛星画像で確認された」という設問。
+* 必要スキル: 船舶自動識別装置（AIS）データの利用（MarineTrafficやVesselFinder）、およびセンチネル（Sentinel）衛星などの衛星画像ブラウザ（EO Browser）の操作能力。
+* 推論プロセス: 対象船舶のMMSI（海上移動業務識別コード）を特定し、過去の航跡データから該当日時の位置情報を割り出す。
+事例研究：航空機のモードSコード特定 5
+1989年のニュース映像に映った航空機のトランスポンダーコード（Mode S Hex Code）を特定する課題。
+* 分析: 映像から機体記号（レジストレーションナンバー、例：N5247P）を読み取る。
+* 変換: 機体記号からMode Sコードへの変換アルゴリズム（または変換サイト）を使用し、16進数のコード（AD9D6A）を導き出す。
+これらの課題は、特定のドメイン知識（航空・海事）と、専用データベースへのアクセス方法を知っているかどうかが勝敗を分けるポイントとなる。
+1.3 初心者が陥りやすい罠と対策
+SWIMMERは初心者向けを謳っているが、それは「技術的なハッキングが不要」という意味であり、「思考停止で解ける」という意味ではない。初心者が直面する主な障壁は以下の通りである。
+1. ラビットホール（迷宮）への没入: 一つの検索結果や仮説に固執し、数時間を浪費する現象。対策としては、チーム内で「15分ルール（15分成果がなければ視点を変える）」を徹底することが有効である 6。
+2. 言語の壁: ロシア語、中国語、アラビア語などの看板や文書が登場する。画像翻訳ツール（Google Lens, Yandex Image Translate）や、後述するLLMの活用が必須である。
+3. ツールへの過信: ツールはあくまで補助であり、最終的な確認は人間の目で行う必要がある。特にAIによる幻覚（ハルシネーション）には警戒が必要である 7。
+________________
+第2章：エージェント型AI「Claude Code」の技術的基盤と導入戦略
+SWIMMER 2026において他チームに対する圧倒的なアドバンテージを得るためには、従来の手作業によるOSINTに加え、自律型AIエージェントの導入が極めて有効である。Anthropic社が提供する「Claude Code」は、単なるチャットボットではなく、端末（ターミナル）内でコマンドを実行し、ファイルシステムを操作し、複雑な推論を行う「エンジニアリングエージェント」である 8。
+2.1 Claude Codeのアーキテクチャと「Cowork」との相違
+まず、CTF参加者が理解すべきは、Claude Code（CLIツール）と「Cowork（デスクトップ機能）」の明確な違いである 10。
+* Cowork: Claudeのデスクトップアプリに統合された機能で、一般的な事務作業（フォルダ整理、旅行計画など）の自律実行に長けている。GUIベースで直感的だが、CTFで求められる細かいスクリプト制御や特定のツールチェーンとの連携には不向きな側面がある。
+* Claude Code (CLI): ターミナルで動作し、開発者やセキュリティエンジニア向けに設計されている。bashコマンドの実行、Git操作、Pythonスクリプトの作成・実行が可能であり、OSINTツール（exiftool, ffmpeg, grepなど）を直接呼び出して結果を解析できる 13。CTFにおいては、こちらのCLI版の導入が推奨される。
+2.2 インストールと初期設定（セットアップ手順）
+SWIMMERに向けた「OSINTワークベンチ」としてのClaude Code環境構築手順を以下に示す。
+2.2.1 前提条件とインストール
+Claude CodeはNode.js環境で動作する。以下のコマンドでインストールを行う 9。
+
+
+Bash
+
+
+
+
+# Node.js 18以上が必要
+$ node -v
+
+# Claude Codeのグローバルインストール
+$ npm install -g @anthropic-ai/claude-code
+
+# 認証（ブラウザが開き、Anthropicアカウントとの連携が求められる）
+$ claude login
+
+2.2.2 セキュリティモデルと権限管理
+OSINT調査では、不審なファイル（マルウェア解析問題など）を扱う可能性があるため、Claude Codeの権限管理を理解しておくことが不可欠である。Claude Codeは「Tiered Permission System（階層型権限システム）」を採用している 14。
+* Read-Only: デフォルトではファイルの読み取りのみが可能。
+* Bash Execution: コマンド実行時には都度ユーザーの承認（Approval）が求められる。
+* Sandboxing: --sandbox フラグや設定により、ファイルシステムやネットワークへのアクセスを制限された環境でコマンドを実行できる 15。
+CTF向け推奨設定:
+大会中はスピードが求められるため、安全なツール（ls, echo, catなど）については承認なしで実行できるよう設定し、破壊的なコマンドや外部通信のみ承認制にすることが望ましい。これは settings.json または起動時のフラグ --allowedTools で制御可能である 17。
+
+
+Bash
+
+
+
+
+# CTF用起動コマンド例（git操作や読み取りを許可しつつ起動）
+$ claude --allowedTools "Bash(git status),Bash(ls),Read" 
+
+2.3 コンテキスト制御：CLAUDE.mdによる作戦指揮
+Claude Codeの最も強力な機能の一つが、プロジェクトごとの設定ファイル CLAUDE.md である 17。このファイルをカレントディレクトリに配置することで、Claudeに対して「役割（Persona）」と「行動規範（Rules of Engagement）」を永続的に指示することができる。
+SWIMMER OSINT CTF用に、以下のような CLAUDE.md を作成し、作業ディレクトリのルートに配置することを強く推奨する。
+推奨される CLAUDE.md の構成案：
+SWIMMER OSINT CTF Mission Profile
+Role
+あなたは高度なOSINT分析官です。私の指示に従い、公開情報のみを用いて課題を解決します。
+Operational Constraints (絶対厳守)
+1. NO ACTIVE SCANNING: 対象サーバーへの攻撃、ポートスキャン、負荷をかける行為は禁止です。
+2. PASSIVE RECON ONLY: 検索エンジン、アーカイブ、Whois、DNS情報のみを使用してください。
+3. Evidence Based: 推測で回答せず、必ず根拠となるURLや画像の特徴を提示してください。
+Tool Usage Protocols
+* 画像解析には exiftool を優先して使用してください。
+* 動画からのフレーム抽出には ffmpeg を使用し、テキスト抽出を試みてください。
+* データの集計やフィルタリングには Python (pandas) を使用してください。
+Output Format
+* フラグ形式: Diver26{...} または Swimmer{...}
+* 思考プロセス: 観察(Observe) -> 仮説(Orient) -> 検証(Act) のサイクルで出力してください。
+このファイルを配置することで、セッションを開始するたびに「OSINT分析官」としての振る舞いがロードされ、ルールの逸脱（禁止されているアクティブスキャンなど）を防ぐことができる 9。
+2.4 画像入力とマルチモーダル能力
+OSINT CTFでは画像分析が主となるため、Claude Codeへの画像入力方法は必須知識である。
+資料によれば、Claude Codeはターミナルへのドラッグ＆ドロップによる画像パスの入力や、クリップボードからの貼り付け（Ctrl+V）に対応している 18。
+* コマンド例:
+analyze this image: /path/to/challenge_image.jpg
+* 機能: OCR（文字認識）、ランドマーク識別、植生や建築様式の分析が可能。ただし、Claude CodeのCLI自体が画像を表示するわけではないため、解析結果はテキストで出力される。
+________________
+第3章：運用ツール群の統合とMCP（Model Context Protocol）の活用
+Claude Code単体でも強力であるが、外部ツールやAPIと連携させることで、その能力は飛躍的に向上する。これを実現するのが Model Context Protocol (MCP) である 20。SWIMMER 2026においては、MCPを用いて「検索能力」と「ブラウザ操作能力」をClaudeに付与することが勝利への鍵となる。
+3.1 OSINTにおけるMCPサーバーの戦略的配置
+デフォルトのClaudeモデルはトレーニングデータに含まれる知識しか持っていないため、最新のニュースや現在のWebサイトの状態を知ることができない。これを補うために、Web検索やWebブラウジング機能を持つMCPサーバーを接続する。
+3.1.1 検索機能の拡張（Brave Search / Google Search）
+リアルタイムな情報を取得するために、検索エンジンのAPIを叩くMCPサーバーを導入する。これにより、Claudeは「2025年1月のブラジル・サンミゲル市長の支払い記録」4 といった最新の時事問題を検索できるようになる。
+   * 推奨MCP: brave-search または google-search
+   * 設定コマンド例（claude mcp addを使用）21:
+Bash
+claude mcp add brave-search -- npx -y @modelcontextprotocol/server-brave-search
+
+※APIキーの設定が必要となる場合がある。
+3.1.2 ブラウザ操作の自動化（Puppeteer / Playwright）
+動的なWebサイト（JavaScriptでコンテンツが生成されるサイト）や、スクリーンショットの取得が必要な場合、ヘッドレスブラウザを操作するMCPが有効である 22。
+      * シナリオ: 「このURLのページにアクセスし、フッターにある著作権表示の年を確認せよ」
+      * Claudeの動作: Puppeteer MCPを通じてブラウザを起動し、DOM（ドキュメントオブジェクトモデル）を解析してテキストを抽出する。
+3.2 必須OSINTツールとClaude Codeによるオーケストレーション
+Claude Codeは、ローカルにインストールされたLinuxコマンドラインツールを「手足」として使うことができる。以下は、SWIMMER参加前にインストールし、Claudeから呼び出せるようにしておくべきツール群である 23。
+ツール名
+	用途
+	Claude Codeでの活用プロンプト例
+	ExifTool
+	画像メタデータ解析
+	"Run exiftool on photo.jpg and list all GPS tags."
+	FFmpeg
+	動画解析・フレーム抽出
+	"Extract frames from video.mp4 every 5 seconds to ./frames/."
+	grep / ripgrep
+	テキスト検索
+	"Search for the string 'Diver26' in all files recursively."
+	TheHarvester
+	メール・ドメイン収集
+	"Run theHarvester on domain diverctf.org utilizing passive sources."
+	Python (Pandas)
+	データ分析
+	"Write a script to load log.csv and find IPs with >100 requests."
+	3.3 データ分析の自動化とPython実行
+SWIMMERでは、大量のログデータやCSVファイルが配布され、そこから特異点を見つける課題（SOCMINT/Forensics）が出題されることがある 4。人間がExcelでフィルタリングを行うよりも、Claude CodeにPythonスクリプトを書かせて実行させる方が圧倒的に高速である 26。
+      * ワークフロー:
+      1. 指示: 「このCSVファイルのヘッダーを読み取り、構造を理解せよ」
+      2. 実行: Claudeが head コマンドなどでファイルをプレビュー。
+      3. 指示: 「'amount' カラムが最大の値を持つ行を抽出し、その行の 'date' を答えよ」
+      4. 実行: Claudeが一時的なPythonスクリプトを作成し、サンドボックス内で実行、結果のみを返す。
+この「コード実行ツール（Code Execution Tool）」は、複雑な計算やデータ処理において強力な武器となる。
+________________
+第4章：実戦的ワークフローとシナリオ別対処法
+ここでは、SWIMMER OSINT CTFで想定される具体的な課題に対し、Claude CodeとOSINT技術をどのように組み合わせて対処するか、詳細なシナリオベースのワークフローを提示する。
+4.1 シナリオA：手掛かりの少ない画像からのジオロケーション
+課題: 「この写真の撮影場所の近くにある交差点の名前を答えよ。写真には『Pizzeria』という看板と、特徴的なライオンの彫像が写っている。」
+Step 1: 画像分析と初期推論（Observe & Orient）
+      * ユーザーアクション: 画像をClaude Codeのターミナルにドラッグ＆ドロップする。
+      * プロンプト: 「この画像を分析してください。看板の文字、建築様式、彫像の特徴、植生、交通ルール（右側通行か左側通行か）を詳細に記述してください。」
+      * Claudeの出力: 「イタリア語の看板が見えます。建築様式はバロック調です。彫像は盾を持ったライオンで、フィレンツェの紋章に類似しています。」
+Step 2: 検索による絞り込み（Decide）
+      * プロンプト: 「検索MCPを使用して、『Pizzeria』と『Lion statue holding shield』の組み合わせでイタリア国内の場所を検索してください。」
+      * Claudeの動作: Web検索を実行し、候補となる都市や広場のリストを提示する。
+Step 3: 具体的な場所の特定（Act）
+      * ユーザーアクション: 候補地をGoogleマップのストリートビューで確認する（ここでの最終確認は人間が行うのが確実である）。
+      * プロンプト: 「特定された広場に面している交差点の名前を、OpenStreetMapデータを使って調べてください。」
+      * Claudeの動作: Overpass Turboのクエリ構文を生成、あるいは検索を行い、交差点名（例：Piazza della Signoria）を回答する。
+4.2 シナリオB：動画からの特定物体追跡（TRANSINT）
+課題: 「動画に映っている車のメーカーと、撮影された滑走路の場所を特定せよ。」（DIVER 2025の「Hole」課題に類似 5）
+Step 1: フレーム抽出とOCR
+      * プロンプト: 「video.mp4 から鮮明なフレームを抽出し、写っているテキストがあればOCRで読み取ってください。」
+      * Claudeの動作: ffmpegを実行し、抽出された画像から「使用飞跃功能时...」という中国語の警告文を検出する。
+Step 2: キーワード検索と車種特定
+      * プロンプト: 「検出された中国語『使用飞跃功能时』に関連する自動車の機能を検索してください。」
+      * Claudeの動作: 検索の結果、これがBYDの高級EVブランド「Yangwang U9（仰望 U9）」の「Leap function（跳躍機能）」に関連する警告であることを特定する 5。
+Step 3: インフラ特徴からの場所特定
+      * プロンプト: 「Yangwang U9のテスト走行が行われた場所として、中国の山西省（Shanxi）大同（Datong）が候補に挙がっています。Overpass Turboを使用して、大同市内の『aeroway=runway』タグを持つ場所をリストアップしてください。」
+      * Claudeの動作: Overpass QL（クエリ言語）を作成し、ユーザーに提示する。
+C
+[out:json];
+area->.searchArea;
+(
+ way["aeroway"="runway"](area.searchArea);
+);
+out body;
+>;
+out skel qt;
+
+      * 結果: 候補となる飛行場やテストコースの座標が得られる。あとは衛星画像で滑走路のマーキングを照合して完了となる。
+4.3 シナリオC：大量の文書からの情報抽出（Text Mining）
+課題: 「過去20年分の市議会議事録（PDF数百ファイル）の中から、ある交差点への苦情に関する発言を見つけ出せ。」
+Step 1: テキスト変換とインデックス化
+         * プロンプト: 「カレントディレクトリにある全てのPDFファイルをテキストに変換し、'intersection' や 'complaint'、'traffic' というキーワードが含まれるファイルを抽出するPythonスクリプトを作成して実行してください。」
+         * Claudeの動作: pdfminer や pypdf ライブラリを使用したスクリプトを作成・実行し、該当するファイルを特定する。
+Step 2: 文脈解析
+         * プロンプト: 「特定されたテキストファイルの内容を読み取り、20年前の11月に関連する苦情の内容を要約してください。」
+         * Claudeの動作: ファイルの中身を解析し、「20年前の11月に、信号機のタイミングについて苦情を入れた」という発言者を特定する 4。
+________________
+第5章：交戦規定（ROE）とカウンターインテリジェンス
+SWIMMER OSINT CTFに参加する上で、最も注意すべきは「ルール違反による失格」と「OPSEC（作戦保全）の失敗」である。
+5.1 アクティブスキャンの禁止と受動的偵察の徹底
+DIVER/SWIMMERのルールでは、対象サーバーへの負荷をかける行為や、脆弱性スキャン（Active Scanning）は厳禁とされていることが多い 28。
+Claude Codeを使用する際、誤って攻撃的なツールを使用しないよう注意が必要である。
+         * 禁止コマンド: nmap, masscan, nikto, sqlmap, hydra（これらは攻撃とみなされる可能性が高い）。
+         * 推奨アプローチ: curl -I（ヘッダー取得のみ）、nslookup、dig、whoisなどの標準的なネットワーク診断コマンドや、Shodan、Censysといった「他者がスキャンした結果のデータベース」を参照する受動的（Passive）手法を徹底する。
+         * Claudeへの指示: CLAUDE.md に「攻撃的なスキャンツールは絶対に使用しないこと」と明記することで、AIが自律的にこれらのツールを提案・実行することを防ぐ防壁（ガードレール）となる。
+5.2 OPSECと情報の取り扱い
+AIエージェントを使用する際、プライバシーと情報漏洩のリスクを考慮しなければならない 10。
+         * フラグのアップロード禁止: CTFのフラグ形式（Diver26{...}など）を外部のパブリックなLLMサービスに入力することは、将来的な学習データに含まれるリスクがあるため、慎重になるべきである（Claude Codeのエンタープライズ設定や、Anthropicのデータ保持ポリシーを確認すること）。
+         * 個人情報の扱い: OSINT調査では実在の人物のSNSなどを扱う場合がある。これらの情報を無闇に拡散したり、攻撃対象としたりすることは倫理規定（Code of Conduct）に違反する。調査はあくまで「公開情報の収集」に留め、対象者への直接接触（Social Engineering）は絶対に行ってはならない。
+5.3 チーム内ナレッジ共有
+SWIMMERはチーム戦である。Claude Codeで得られた知見（スクリプトや調査ログ）は、Gitなどを通じてチーム内で共有すべきである 17。
+CLAUDE.md をリポジトリにコミットし共有することで、チームメンバー全員のClaudeエージェントが同じ「作戦コンテキスト」を共有できるようになる。これは、情報のサイロ化を防ぎ、チーム全体の調査能力を底上げする効果的な戦術である。
+結論
+SWIMMER DIVER OSINT CTF 2026への挑戦は、古典的な調査手法と、Claude Codeに代表される最先端のAIエージェント技術を融合させる絶好の機会である。勝敗を分けるのは、ツールの有無ではなく、それを使いこなす人間の「問いを立てる力（Questioning Strategy）」と「検証の厳密さ（Verification Rigor）」にある。
+本レポートで詳述した環境構築、MCPによる機能拡張、そしてシナリオベースのワークフローを習得し、適切な準備を行うことで、参加者は単なる「回答者」から、高度な分析能力を持つ「インテリジェンス・オフィサー」へと進化を遂げることができるだろう。1月17日の作戦開始に向け、今すぐターミナルを開き、自身のエージェントとの協調訓練を開始することを強く推奨する。
+引用文献
+         1. CTFtime.org / DIVER OSINT CTF, 1月 16, 2026にアクセス、 https://ctftime.org/ctf/1111/
+         2. DIVER OSINT CTF - GitHub, 1月 16, 2026にアクセス、 https://github.com/diver-osint-ctf
+         3. swimmer osint ctf - CTFTime, 1月 16, 2026にアクセス、 https://ctftime.org/event/2986/
+         4. DIVER OSINT CTF, 1月 16, 2026にアクセス、 https://diverctf.org/en.html
+         5. Writeup of DIVER OSINT CTF 2025 - Medium, 1月 16, 2026にアクセス、 https://medium.com/@PretendNotToBe/writeup-of-diver-osint-ctf-2025-ea6e8f3fb763
+         6. 13 Best OSINT (Open Source Intelligence) Tools for 2025 [UPDATED] - Talkwalker, 1月 16, 2026にアクセス、 https://www.talkwalker.com/blog/best-osint-tools
+         7. Created a Claude Code instance that acts an OSINT investigator co pilot (In an hour)- it's incredible! : r/threatintel - Reddit, 1月 16, 2026にアクセス、 https://www.reddit.com/r/threatintel/comments/1qao6fo/created_a_claude_code_instance_that_acts_an_osint/
+         8. Claude Code overview - Claude Code Docs, 1月 16, 2026にアクセス、 https://code.claude.com/docs/en/overview
+         9. Claude Code is an agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster by executing routine tasks, explaining complex code, and handling git workflows - all through natural language commands. - GitHub, 1月 16, 2026にアクセス、 https://github.com/anthropics/claude-code
+         10. Anthropic Cowork is the desktop PC partner you always wanted: Everything to know about this new Agentic AI tool, 1月 16, 2026にアクセス、 https://www.financialexpress.com/life/technology-anthropic-cowork-is-the-desktop-pc-partner-you-always-wanted-everything-to-know-about-this-new-agentic-ai-toolnbsp-4106054/
+         11. What is Cowork, Anthropic’s new agentic AI tool designed for non-developers?, 1月 16, 2026にアクセス、 https://indianexpress.com/article/technology/artificial-intelligence/what-is-cowork-anthropic-agentic-ai-tool-claude-10470733/
+         12. Anthropic launches Cowork, Claude Code for non-coding work, 1月 16, 2026にアクセス、 https://www.siliconrepublic.com/machines/anthropic-cowork-claude-code-for-non-coding-work
+         13. Quickstart - Claude Code Docs, 1月 16, 2026にアクセス、 https://code.claude.com/docs/en/quickstart
+         14. Identity and Access Management - Claude Code Docs, 1月 16, 2026にアクセス、 https://code.claude.com/docs/en/iam
+         15. Making Claude Code more secure and autonomous with sandboxing - Anthropic, 1月 16, 2026にアクセス、 https://www.anthropic.com/engineering/claude-code-sandboxing
+         16. Sandboxing - Claude Code Docs, 1月 16, 2026にアクセス、 https://code.claude.com/docs/en/sandboxing
+         17. Claude Code: Best practices for agentic coding - Anthropic, 1月 16, 2026にアクセス、 https://www.anthropic.com/engineering/claude-code-best-practices
+         18. Can Claude Code see images— and how does that work in 2025? - CometAPI, 1月 16, 2026にアクセス、 https://www.cometapi.com/can-claude-code-see-images-and-how-does-that-work-in-2025/
+         19. Drag and drop for uploading images in Claude Code! : r/ClaudeAI - Reddit, 1月 16, 2026にアクセス、 https://www.reddit.com/r/ClaudeAI/comments/1kz9qdu/drag_and_drop_for_uploading_images_in_claude_code/
+         20. OSINT MCP - Awesome MCP Servers, 1月 16, 2026にアクセス、 https://mcpservers.org/servers/brutus-gr/osint-mcp
+         21. Arguably, the best web search MCP server for Claude Code, Codex, and other coding tools : r/LocalLLaMA - Reddit, 1月 16, 2026にアクセス、 https://www.reddit.com/r/LocalLLaMA/comments/1q6khuh/arguably_the_best_web_search_mcp_server_for/
+         22. punkpeye/awesome-mcp-servers - GitHub, 1月 16, 2026にアクセス、 https://github.com/punkpeye/awesome-mcp-servers
+         23. 10 OSINT Tools Hackers Need to Know About - Hack The Box, 1月 16, 2026にアクセス、 https://www.hackthebox.com/blog/10-osint-tools
+         24. CTF Toolkit Guide. (Beginner Friendly) | by MJ Montez ‍ | Medium, 1月 16, 2026にアクセス、 https://medium.com/@ohheyymjincyber/ctf-toolkit-guide-9f5bda3931ea
+         25. 15 Best OSINT tools in 2026 - Lampyre, 1月 16, 2026にアクセス、 https://lampyre.io/blog/15-best-osint-tools-in-2025/
+         26. Introducing advanced tool use on the Claude Developer Platform - Anthropic, 1月 16, 2026にアクセス、 https://www.anthropic.com/engineering/advanced-tool-use
+         27. Code execution tool - Claude Docs, 1月 16, 2026にアクセス、 https://platform.claude.com/docs/en/agents-and-tools/tool-use/code-execution-tool
+         28. OSINT Techniques: Complete List for Investigators (2026) - ShadowDragon.io, 1月 16, 2026にアクセス、 https://shadowdragon.io/blog/osint-techniques/
+         29. 1月 1, 1970にアクセス、 https://github.com/diver-osint-ctf/rule
+         30. Claude based OSINT Agent : r/ClaudeAI - Reddit, 1月 16, 2026にアクセス、 https://www.reddit.com/r/ClaudeAI/comments/1l0u04f/claude_based_osint_agent/

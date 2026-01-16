@@ -1,0 +1,34 @@
+# OSINT CTF Python Dependencies
+
+# データ分析
+pandas>=2.0.0
+numpy>=1.24.0
+
+# 画像処理
+Pillow>=10.0.0
+opencv-python-headless>=4.8.0
+
+# PDF処理
+pypdf>=3.0.0
+pdfminer.six>=20221105
+
+# Web関連
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+lxml>=4.9.0
+
+# OCR
+pytesseract>=0.3.10
+
+# 地理情報
+geopy>=2.4.0
+folium>=0.15.0
+
+# ユーティリティ
+python-dateutil>=2.8.0
+pytz>=2023.3
+tqdm>=4.66.0
+
+# Jupyter（対話的分析用）
+jupyter>=1.0.0
+ipython>=8.0.0

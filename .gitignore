@@ -1,0 +1,65 @@
+# OS generated files
+**/.DS_Store
+.DS_Store?
+**/._*
+.Spotlight-V100
+.Trashes
+**/Thumbs.db
+
+# IDE
+**/.idea/
+**/.vscode/
+**/*.swp
+**/*.swo
+
+# Claude Code local settings
+**/.claude/settings.local.json
+
+# Node.js
+**/node_modules/
+**/*.lock
+**/bun.lock
+**/package-lock.json
+
+# Python
+**/__pycache__/
+**/*.py[cod]
+**/*.so
+**/.Python
+**/env/
+**/venv/
+**/.venv/
+
+# Jupyter
+**/.ipynb_checkpoints/
+
+# Temporary files
+**/*.tmp
+**/*.temp
+**/*.log
+
+# Large media files (add specific files if needed)
+# **/*.mp4
+# **/*.avi
+# **/*.mov
+
+# Extracted frames (regeneratable)
+**/frames/
+!challenges/**/frames/.gitkeep
+
+# Secrets (never commit)
+**/.env
+**/.env.*
+**/*.key
+**/credentials.json
+**/secrets.json
+
+# Challenge-specific (uncomment if sharing writeups)
+# challenges/**/evidence/
+
+# Build artifacts
+**/dist/
+**/build/
+
+# Docker
+**/.docker/

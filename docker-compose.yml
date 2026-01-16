@@ -1,0 +1,42 @@
+services:
+  osint:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: osint-workbench:latest
+    container_name: osint-ctf
+    volumes:
+      # 作業ディレクトリをマウント
+      - ./challenges:/workspace/challenges
+      - ./tools:/workspace/tools
+      - ./references:/workspace/references
+      - ./writeups:/workspace/writeups
+    working_dir: /workspace
+    stdin_open: true
+    tty: true
+    # ネットワークアクセス（パッシブ調査用）
+    network_mode: bridge
+
+  # Jupyter Notebook サーバー（データ分析用）
+  jupyter:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: osint-workbench:latest
+    container_name: osint-jupyter
+    volumes:
+      - ./challenges:/workspace/challenges
+      - ./tools:/workspace/tools
+    working_dir: /workspace
+    ports:
+      - "8888:8888"
+    command: >
+      jupyter notebook
+      --ip=0.0.0.0
+      --port=8888
+      --no-browser
+      --allow-root
+      --NotebookApp.token=''
+      --NotebookApp.password=''
+    profiles:
+      - jupyter
