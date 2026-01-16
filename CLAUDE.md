@@ -32,12 +32,31 @@ OSINT分析官として、公開情報のみを用いて課題を解決する。
 docker compose run --rm osint <command>
 ```
 
-**専用スキルを使用:**
-- `osint-image` - 画像メタデータ抽出、OCR
-- `osint-video` - 動画フレーム抽出、メタデータ
-- `osint-geoint` - 座標変換、Overpass Turbo、ジオロケーション
-- `osint-web` - Wayback Machine、SNSアーカイブ調査
-- `osint-youtube` - 動画情報、字幕取得、フレーム抽出
+**スキル一覧** （詳細: `.claude/skills/<name>/SKILL.md`）
+
+| スキル | 用途 | 主なコマンド/スクリプト |
+|--------|------|------------------------|
+| `osint-image` | 画像メタデータ、OCR | `exiftool`, `tesseract`, `analyze_image.py` |
+| `osint-video` | 動画フレーム抽出 | `ffmpeg`, `ffprobe`, `extract_frames.py` |
+| `osint-geoint` | 座標変換、地図リンク | `coord_links.py`, geopy |
+| `osint-web` | Wayback Machine | `wayback.py` |
+| `osint-youtube` | YouTube情報・字幕 | `ytinfo.py`, yt-dlp |
+
+**クイック例:**
+
+```bash
+# 画像メタデータ
+docker compose run --rm osint exiftool /workspace/challenges/<name>/evidence/image.jpg
+
+# 座標→マップリンク生成
+docker compose run --rm osint python /workspace/.claude/skills/osint-geoint/scripts/coord_links.py 35.6812 139.7671
+
+# YouTube動画情報
+docker compose run --rm osint python /workspace/.claude/skills/osint-youtube/scripts/ytinfo.py "https://youtu.be/xxx"
+
+# Wayback Machineアーカイブ一覧
+docker compose run --rm osint python /workspace/.claude/skills/osint-web/scripts/wayback.py "https://example.com" --list
+```
 
 ---
 
@@ -50,7 +69,7 @@ docker compose run --rm osint <command>
 ## Directory Structure
 
 ```
-challenges/<name>/
+challenges/<source>/<name>/
 ├── evidence/    # 収集した証拠
 ├── frames/      # 動画フレーム
 └── writeup.md   # 解法メモ
