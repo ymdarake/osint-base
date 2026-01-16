@@ -19,6 +19,7 @@ Sofia Santos (@Gralhix) が提供する無料のOSINT練習問題集。
 
 | # | タイトル | 難易度 | カテゴリ |
 |---|----------|--------|----------|
+| 003 | トルコ大統領府特定 | Medium | GEOINT/Building ID |
 | 006 | 画像検証（TTPパキスタン攻撃） | Easy | Verification |
 | 021 | チョコレート地図 | Easy | GEOINT |
 | 027 | Lectura en Movimiento | Easy | Event/Person ID |
