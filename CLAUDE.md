@@ -36,6 +36,8 @@ docker compose run --rm osint <command>
 - `osint-image` - 画像メタデータ抽出、OCR
 - `osint-video` - 動画フレーム抽出、メタデータ
 - `osint-geoint` - 座標変換、Overpass Turbo、ジオロケーション
+- `osint-web` - Wayback Machine、SNSアーカイブ調査
+- `osint-youtube` - 動画情報、字幕取得、フレーム抽出
 
 ---
 

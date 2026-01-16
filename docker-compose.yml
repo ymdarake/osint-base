@@ -10,7 +10,7 @@ services:
       - ./challenges:/workspace/challenges
       - ./tools:/workspace/tools
       - ./references:/workspace/references
-      - ./writeups:/workspace/writeups
+      - ./.claude/skills:/workspace/.claude/skills
     working_dir: /workspace
     stdin_open: true
     tty: true
@@ -27,6 +27,7 @@ services:
     volumes:
       - ./challenges:/workspace/challenges
       - ./tools:/workspace/tools
+      - ./.claude/skills:/workspace/.claude/skills
     working_dir: /workspace
     ports:
       - "8888:8888"

@@ -153,14 +153,21 @@ URL: https://what3words.com/
 - 建物の建設状況
 - 影の長さ/方向 → 太陽位置計算
 
-## 有用なサービス
+## スクリプト
 
-| サービス | 用途 | URL |
-|---------|------|-----|
-| Google Earth Pro | 過去の衛星画像 | デスクトップアプリ |
-| Sentinel Hub | 衛星画像ブラウザ | https://apps.sentinel-hub.com/eo-browser/ |
-| SunCalc | 太陽位置計算 | https://www.suncalc.org/ |
-| GeoGuessr | 練習用 | https://www.geoguessr.com/ |
+### scripts/coord_links.py
+
+座標から各種マップサービスのリンクを一括生成。
+
+```bash
+docker compose run --rm osint python /workspace/.claude/skills/osint-geoint/scripts/coord_links.py 41.352757 -4.690017
+```
+
+**出力例:**
+- Google Maps, Earth, StreetView
+- OpenStreetMap, Yandex, Bing
+- what3words, SunCalc, Sentinel Hub
+- Overpass Turbo
 
 ## 出力形式
 

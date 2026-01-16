@@ -59,6 +59,7 @@ echo "exiftool: $(exiftool -ver)"\n\
 echo "ffmpeg: $(ffmpeg -version 2>&1 | head -1)"\n\
 echo "ripgrep: $(rg --version | head -1)"\n\
 echo "tesseract: $(tesseract --version 2>&1 | head -1)"\n\
+echo "yt-dlp: $(yt-dlp --version)"\n\
 echo "python: $(python --version)"\n\
 echo ""\n\
 echo "Ready for OSINT CTF!"' > /usr/local/bin/osint-check && \
