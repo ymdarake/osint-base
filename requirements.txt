@@ -29,6 +29,11 @@ python-dateutil>=2.8.0
 pytz>=2023.3
 tqdm>=4.66.0
 
+# カレンダー変換
+hijri-converter>=2.3.0
+jdatetime>=4.1.0
+nepali-datetime>=1.0.7
+
 # 動画・アーカイブ
 yt-dlp>=2024.0.0
 

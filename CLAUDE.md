@@ -39,6 +39,7 @@ docker compose run --rm osint <command>
 | `osint-image` | 画像メタデータ、OCR | `exiftool`, `tesseract`, `analyze_image.py` |
 | `osint-video` | 動画フレーム抽出 | `ffmpeg`, `ffprobe`, `extract_frames.py` |
 | `osint-geoint` | 座標変換、地図リンク | `coord_links.py`, geopy |
+| `osint-chrono` | カレンダー・時間変換 | `calendar_convert.py` |
 | `osint-web` | Wayback Machine | `wayback.py` |
 | `osint-youtube` | YouTube情報・字幕 | `ytinfo.py`, yt-dlp |
 
@@ -56,6 +57,9 @@ docker compose run --rm osint python /workspace/.claude/skills/osint-youtube/scr
 
 # Wayback Machineアーカイブ一覧
 docker compose run --rm osint python /workspace/.claude/skills/osint-web/scripts/wayback.py "https://example.com" --list
+
+# カレンダー変換（ペルシャ暦→グレゴリオ暦）
+docker compose run --rm osint python /workspace/.claude/skills/osint-chrono/scripts/calendar_convert.py --from persian --to gregorian 1401 12 2
 ```
 
 ---
