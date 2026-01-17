@@ -67,8 +67,35 @@ docker compose run --rm osint tesseract /workspace/challenges/<challenge>/eviden
 - Google Images: `https://images.google.com`
 - Yandex Images: `https://yandex.com/images/` （ロシア・東欧に強い）
 - TinEye: `https://tineye.com`
+- PimEyes: `https://pimeyes.com` （顔認識専用）
 
 ## スクリプト
+
+### scripts/reverse_search.py
+
+逆画像検索サービスのURLを一括生成するスクリプト。
+
+```bash
+# 基本的な使用方法（検索URL一覧を生成）
+docker compose run --rm osint python /workspace/.claude/skills/osint-image/scripts/reverse_search.py \
+  /workspace/challenges/<challenge>/evidence/<image>
+
+# 画像URLがある場合（直接検索URLを生成）
+docker compose run --rm osint python /workspace/.claude/skills/osint-image/scripts/reverse_search.py \
+  /workspace/challenges/<challenge>/evidence/<image> --url https://example.com/image.jpg
+
+# ハッシュ値のみ表示
+docker compose run --rm osint python /workspace/.claude/skills/osint-image/scripts/reverse_search.py \
+  /workspace/challenges/<challenge>/evidence/<image> --hash-only
+```
+
+**出力内容:**
+- 画像情報（ファイル名、サイズ、解像度）
+- ハッシュ値（MD5、SHA256）
+- 各検索サービスへのリンク
+  - Google Lens, Google Images, Yandex, TinEye, Bing
+  - 顔認識: PimEyes, FaceCheck, Search4Faces
+  - Reddit専用: KarmaDecay
 
 ### scripts/analyze_image.py
 

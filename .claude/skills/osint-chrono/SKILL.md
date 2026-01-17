@@ -110,7 +110,50 @@ docker compose run --rm osint python /workspace/.claude/skills/osint-chrono/scri
 |---|---|---|---|---|---|---|---|---|---|
 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 |
 
+## 太陽位置・影の計算
+
+### scripts/shadow_calc.py
+
+太陽位置から影の角度を計算、または影の角度から撮影時刻を推定する。
+
+```bash
+# 特定の日時・場所での太陽位置と影の方向を計算
+docker compose run --rm osint python /workspace/.claude/skills/osint-chrono/scripts/shadow_calc.py \
+  --lat 35.6812 --lon 139.7671 --date 2024-06-15 --time 14:30
+
+# 影の方位角から撮影時刻を推定（影が北東=45°を指している場合）
+docker compose run --rm osint python /workspace/.claude/skills/osint-chrono/scripts/shadow_calc.py \
+  --lat 35.6812 --lon 139.7671 --date 2024-06-15 --shadow-azimuth 45
+
+# 1日の太陽軌道を表示
+docker compose run --rm osint python /workspace/.claude/skills/osint-chrono/scripts/shadow_calc.py \
+  --lat 35.6812 --lon 139.7671 --date 2024-06-15 --all-day
+
+# SunCalcへのリンクを生成
+docker compose run --rm osint python /workspace/.claude/skills/osint-chrono/scripts/shadow_calc.py \
+  --lat 35.6812 --lon 139.7671 --date 2024-06-15 --suncalc
+```
+
+**出力内容:**
+- 太陽の方位角・高度
+- 影の方向（太陽の反対方向）
+- 影の長さ比率（物体高さに対する影の長さ）
+- SunCalcへのリンク
+
+**方位角の基準:**
+- 北=0°, 東=90°, 南=180°, 西=270°
+
+### オンラインツール
+
+| ツール | URL | 用途 |
+|--------|-----|------|
+| SunCalc | https://www.suncalc.org/ | 太陽位置・影の可視化 |
+| SunEarthTools | https://www.sunearthtools.com/dp/tools/pos_sun.php | 太陽位置計算 |
+| TimeAndDate | https://www.timeanddate.com/sun/ | 日の出・日の入り |
+
 ## 出力形式
+
+### カレンダー変換
 
 ```
 ## カレンダー変換
@@ -128,4 +171,22 @@ docker compose run --rm osint python /workspace/.claude/skills/osint-chrono/scri
 | Islamic | 1444 Shaban 1 |
 | Nepali | 2079 Falgun 9 |
 | Ethiopian | 2015 Yekatit 14 |
+```
+
+### 影の計算
+
+```
+## 影の角度計算（Chronolocation）
+
+### 入力条件
+- 座標: 35.6812, 139.7671
+- 日付: 2024-06-15
+
+### 太陽位置（14:30 UTC）
+- 方位角: 245.3° (WSW)
+- 高度: 68.2°
+
+### 影の情報
+- 方向: 65.3° (ENE)
+- 長さ比: 0.40x（物体高さの0.40倍）
 ```

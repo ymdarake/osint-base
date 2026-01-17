@@ -169,6 +169,37 @@ docker compose run --rm osint python /workspace/.claude/skills/osint-geoint/scri
 - what3words, SunCalc, Sentinel Hub
 - Overpass Turbo
 
+### scripts/overpass_query.py
+
+座標周辺のOpenStreetMapデータを検索。
+
+```bash
+# 座標周辺500m以内のレストランを検索
+docker compose run --rm osint python /workspace/.claude/skills/osint-geoint/scripts/overpass_query.py \
+  --lat 35.6812 --lon 139.7671 --radius 500 --preset restaurant
+
+# 特定エリアの空港を検索
+docker compose run --rm osint python /workspace/.claude/skills/osint-geoint/scripts/overpass_query.py \
+  --area "Tokyo" --preset airport
+
+# カスタムタグで検索
+docker compose run --rm osint python /workspace/.claude/skills/osint-geoint/scripts/overpass_query.py \
+  --lat 35.6812 --lon 139.7671 --tag "shop=supermarket"
+
+# クエリのみ生成（実行しない）
+docker compose run --rm osint python /workspace/.claude/skills/osint-geoint/scripts/overpass_query.py \
+  --lat 35.6812 --lon 139.7671 --preset hospital --query-only
+```
+
+**プリセットタグ:**
+- 交通: `airport`, `runway`, `station`, `bus_stop`, `parking`, `fuel`
+- 飲食: `restaurant`, `cafe`, `fast_food`, `bar`
+- 宿泊: `hotel`, `hostel`
+- 公共施設: `hospital`, `school`, `university`, `police`, `fire_station`
+- 商業: `supermarket`, `convenience`, `mall`, `bank`, `atm`
+- 観光: `museum`, `monument`, `viewpoint`, `attraction`
+- 宗教: `church`, `mosque`, `temple`, `shrine`
+
 ## 出力形式
 
 ```
